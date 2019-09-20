@@ -60,11 +60,11 @@ export class EsriMapComponent implements OnInit
         {
           if (response.results.length > 0)
           {
-            document.getElementById("viewDiv").style.cursor = "pointer";
+            document.getElementById("mapViewNode").style.cursor = "pointer";
           }
           else
           {
-            document.getElementById("viewDiv").style.cursor = "default";
+            document.getElementById("mapViewNode").style.cursor = "default";
           }
         }
 
