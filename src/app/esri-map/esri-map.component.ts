@@ -112,29 +112,20 @@ export class EsriMapComponent implements OnInit
             });
           });
         });
-        view.on("click", function (event)
-        {
-          var pointXY = {
-            x: event.x,
-            y: event.y
-          };
-
-          view.hitTest(pointXY).then(response =>
-          {
-            if (response.results.length)
+       view.on('click', event => {
+          view.hitTest(event).then(response => {
+            if (response.results.length) 
             {
-              var graphic = response.results.filter(dataResult => {
-                return dataResult.graphic.layer === layerFeature;
+
+              const graphic = response.results.filter(result => {
+                return result.graphic.layer === lFeature;
               })[0].graphic;
-              this.attributes = graphic.attributes;
-              this.selectedFIPS = this.attributes.STATE_FIPS;
-              document.getElementById("TotalPopData").innerHTML = "Total Obligated For " + this.attributes.STATE_NAME + " is: " + this.attributes.POP2007;
+              this.selectedFIPS = graphic.attributes.STATE_NAME;
+              document.getElementById("TotalPopData").innerHTML = "Total Obligated For " + this.selectedFIPS + " is: ";
               this.consoleFIPS();
-            }
-          });
-          //console.log("FIPS CODE: " +this.selectedFIPS);
+            };
+          })
         });
-        //console.log("FIPS CODE: " +this.selectedFIPS);
       })
       .catch(err => {
         console.error(err);
