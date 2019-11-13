@@ -118,7 +118,7 @@ export class EsriMapComponent implements OnInit
             {
 
               const graphic = response.results.filter(result => {
-                return result.graphic.layer === lFeature;
+                return result.graphic.layer === layerFeature;
               })[0].graphic;
               this.selectedFIPS = graphic.attributes.STATE_NAME;
               document.getElementById("TotalPopData").innerHTML = "Total Obligated For " + this.selectedFIPS + " is: ";
