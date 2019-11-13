@@ -17,6 +17,7 @@ export class EsriMapComponent implements OnInit
 
   public selectedFIPS: string;
   public attributes; 
+  public outPutInfo: string;
   constructor() { }
   
   ngOnInit()
@@ -28,8 +29,8 @@ export class EsriMapComponent implements OnInit
       "esri/layers/FeatureLayer",
       "esri/renderers/UniqueValueRenderer",
       "esri/symbols/SimpleLineSymbol",
-      "esri/layers/MapImageLayer"
-      
+      "esri/layers/MapImageLayer",
+      "esri/request"
     ])
       .then(([
         watchUtils,
@@ -38,12 +39,14 @@ export class EsriMapComponent implements OnInit
         FeatureLayer,
         UniqueValueRenderer,
         SimpleLineSymbol,
-        MapImageLayer]) =>
+        MapImageLayer,
+        esriRequest]) =>
       {
         let layerFeature = new FeatureLayer({
           url: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/3",
           outFields: ["*"]
         })
+        let requestURL = "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/3/query"; 
         const map = new Map({
           basemap: "topo",
           layers: [layerFeature]
@@ -55,6 +58,21 @@ export class EsriMapComponent implements OnInit
           center: [-94, 37],
           zoom: 5,
         });
+        let queryOptions = {
+          responseType: "json",
+          query: {
+            f: "json",
+            where: "OBJECTID = 10",
+            returnGeometry: false,
+            outFields: "*"
+          }
+        };
+        esriRequest(requestURL,queryOptions).then(function(response){
+          let someVar = response.data;
+          //console.log("REST Request: "+someVar.features[0].attributes.STATE_NAME); 
+          this.outPutInfo = someVar.features[0].attributes.STATE_NAME;
+          console.log("REST Request: "+this.outPutInfo); 
+        })
         
         function changeCursor(response)
         {
