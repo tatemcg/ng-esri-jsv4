@@ -1,0 +1,184 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Filter</title>
+<style>
+	 #viewDiv {
+		padding: 0;
+		margin: 0;
+		height: 600px;
+		width: 100%; 
+	  }   
+</style>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.13/esri/css/main.css"> 
+	<script src="https://js.arcgis.com/4.13/"></script>
+    <script>
+	require([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/Graphic",
+      "esri/layers/GraphicsLayer",
+	  "esri/layers/FeatureLayer", 
+	  "esri/widgets/Home"
+    ], function(Map, MapView, Graphic, GraphicsLayer, FeatureLayer, Home) {
+	
+		let flayer = new FeatureLayer({
+			//url: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer/0",
+			url: "https://gis.recovery.pr/webgis/rest/services/pf_damage/MapServer/0",
+			outFields: ["*"]
+		});
+
+		var map = new Map({
+			basemap: "gray-vector"
+		});
+		
+		var view = new MapView({
+			container: "viewDiv",  
+			map: map,
+			//center: [-97.139, 39.682],
+			center: [-66.519, 18.230],
+			zoom: 9
+		});
+		
+
+		
+		//Home button
+		let homeBTN = new Home({
+          view:view
+        })
+		view.ui.add(homeBTN, "top-right"); //add home button to map view ui
+		map.add(flayer);
+		//flayer.definitionExpression = "capital ='Y' AND class = 'city'";
+		//flayer.definitionExpression = "capital ='N'";
+		//flayer.definitionExpression = "class = 'CDP'";
+		//flayer.definitionExpression = "capital ='Y'";
+		//flayer.definitionExpression = "disaster_id IN (2,3)";
+		//flayer.definitionExpression = "disaster_id = 1 AND sector_id = '10'";
+		flayer.definitionExpression = "disaster_id = 1 AND sector_id = 1";
+		
+		document.getElementById("layerCDPCheckBox").addEventListener("click", check);
+		document.getElementById("layerCityCheckBox").addEventListener("click", check);
+		document.getElementById("layerNoCheckBox").addEventListener("click", check);
+		document.getElementById("layerYesCheckBox").addEventListener("click", check);
+
+		function check() {
+			if(layerCDPCheckBox.checked===true){
+				console.log("CDP Checked");
+				map.removeAll();
+				let flayer = new FeatureLayer({
+					url: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer/0",
+					outFields: ["*"],
+					definitionExpression: "class = 'CDP'"
+				});
+				map.add(flayer);
+			}
+			/*if(layerCDPCheckBox.checked===false){
+				console.log("CDP UnChecked");
+				map.removeAll();
+			}*/
+			else if(layerCityCheckBox.checked){
+				console.log("City Checked");
+				map.removeAll();
+				let flayer = new FeatureLayer({
+					url: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer/0",
+					outFields: ["*"],
+					definitionExpression: "class = 'city'"
+				});
+				map.add(flayer);
+
+			}
+			else if(layerNoCheckBox.checked){
+				console.log("No Checked");
+				map.removeAll();
+				let flayer = new FeatureLayer({
+					url: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer/0",
+					outFields: ["*"],
+					definitionExpression: "capital = 'N'"
+				});
+				map.add(flayer);
+			}
+			else if(layerYesCheckBox.checked){
+				console.log("Yes Checked");
+				map.removeAll();
+				flayer.definitionExpression = "capital ='Y' AND class = 'city'";
+				map.add(flayer);
+			}
+		}
+
+		/*view.when().then(function()
+		{
+			map.add(flayer);
+			document.getElementById("layerCDPCheckBox").addEventListener("click", check);
+			document.getElementById("layerCityCheckBox").addEventListener("click", check);
+			document.getElementById("layerNoCheckBox").addEventListener("click", check);
+			document.getElementById("layerYesCheckBox").addEventListener("click", check);
+
+			function check() {
+				if(layerCDPCheckBox.checked===true){
+					console.log("CDP Checked");
+					map.removeAll();
+					let flayer = new FeatureLayer({
+						url: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer/0",
+						outFields: ["*"],
+						definitionExpression: "class = 'CDP'"
+					});
+					map.add(flayer);
+				}
+				if(layerCDPCheckBox.checked===false){
+					console.log("CDP UnChecked");
+					map.removeAll();
+				}
+				else if(layerCityCheckBox.checked){
+					console.log("City Checked");
+					map.removeAll();
+					let flayer = new FeatureLayer({
+						url: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer/0",
+						outFields: ["*"],
+						definitionExpression: "class = 'city'"
+					});
+					map.add(flayer);
+
+				}
+				else if(layerNoCheckBox.checked){
+					console.log("No Checked");
+					map.removeAll();
+					let flayer = new FeatureLayer({
+						url: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer/0",
+						outFields: ["*"],
+						definitionExpression: "capital = 'N'"
+					});
+					map.add(flayer);
+				}
+				else if(layerYesCheckBox.checked){
+					console.log("Yes Checked");
+					map.removeAll();
+					let flayer = new FeatureLayer({
+						url: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer/0",
+						outFields: ["*"],
+						definitionExpression: "capital ='Y'AND class = 'city'"
+					});
+					map.add(flayer);
+				}
+			}
+		});*/
+	
+
+	});
+	</script>
+
+</head>
+<body>
+	<div id="layer_list">
+		<span>Class: </span>
+		<input type='checkbox' class='list_item' id='layerCDPCheckBox' value="CDP" name="checkbox1" />CDP
+		<input type='checkbox' class='list_item' id='layerCityCheckBox' value="City" name="checkbox2" />City
+		</br>
+		</br>
+		<span>Capital: </span>
+		<input type='checkbox' class='list_item' id='layerNoCheckBox' value="No" name="checkbox3" />No
+		<input type='checkbox' class='list_item' id='layerYesCheckBox' value="Yes" name="checkbox4" />Yes
+	</div>
+  <div id="viewDiv"></div>
+</body>
+</html> 
