@@ -1,0 +1,147 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>CheckBox Filter</title>
+<style>
+	 #viewDiv {
+		padding: 0;
+		margin: 0;
+		height: 600px;
+		width: 100%; 
+	  }   
+</style>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.13/esri/css/main.css"> 
+	<script src="https://js.arcgis.com/4.13/"></script>
+    <script>
+	require([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/Graphic",
+	  "esri/layers/FeatureLayer", 
+	  "esri/widgets/Home"
+    ], function(Map, MapView, Graphic, FeatureLayer, Home) {
+	
+		let flayer = new FeatureLayer({
+			url: "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/ArcGIS/rest/services/Landscape_Trees/FeatureServer/0",
+			outFields: ["*"],
+			popupTemplate: {  // Enable a popup on client
+				title: "ID {Tree_ID}", // Show field value
+			}
+		}); 
+				
+		var map = new Map({
+			basemap: "gray-vector"
+		});
+		
+		var view = new MapView({
+			container: "viewDiv",  
+			map: map,
+			center: [-82.44, 35.612],
+			zoom: 15
+		}); 
+		
+		//Home button
+		let homeBTN = new Home({
+          view:view
+        })
+		view.ui.add(homeBTN, "top-right"); //add home button to map view ui
+		//map.add(flayer);
+		//map.add(imageLayer);
+		view.map.add(flayer);
+		
+		document.getElementById("layer1CheckBox").addEventListener("change", check);
+		document.getElementById("layer2CheckBox").addEventListener("change", check);
+		document.getElementById("layer3CheckBox").addEventListener("change", check);
+		document.getElementById("layer4CheckBox").addEventListener("change", check);
+		document.getElementById("layer5CheckBox").addEventListener("change", check);
+
+		function check() {
+			let heightArray = [];
+			let crownBaseArray = []
+			let heightExpression, crownBaseExpression; 
+			if(layer1CheckBox.checked){
+				heightArray.push(document.getElementById("layer1CheckBox").value)
+			}
+			if(layer2CheckBox.checked){
+				heightArray.push(document.getElementById("layer2CheckBox").value)
+			}
+			if(layer3CheckBox.checked){
+				heightArray.push(document.getElementById("layer3CheckBox").value)
+			}
+			if(layer4CheckBox.checked){
+				crownBaseArray.push(document.getElementById("layer4CheckBox").value)
+			}
+			if(layer5CheckBox.checked){
+				crownBaseArray.push(document.getElementById("layer5CheckBox").value)
+			}			
+			
+			console.log("Class Length: "+heightArray.length);
+			console.log("Cat Length: "+crownBaseArray.length);
+
+			if(heightArray.length > 1){
+				heightExpression = "Height IN ("+ heightArray.join(',') +")";
+				console.log("Where "+heightExpression);
+				setFeatureLayerViewFilter(heightExpression);
+			}
+			if(heightArray.length == 1){
+				for(i = 0; i< heightArray.length; i++){
+					heightExpression = "Height = "+heightArray[i];
+				}
+				console.log("Where "+heightExpression);
+				setFeatureLayerViewFilter(heightExpression);
+			}
+			if(heightArray.length == 0){
+				heightExpression='';
+				setFeatureLayerViewFilter(heightExpression);
+			}
+			if(crownBaseArray.length > 1){
+				crownBaseExpression = "crown_base IN ("+ crownBaseArray.join(',') +")";
+				console.log("Where "+crownBaseExpression);
+				setFeatureLayerViewFilter(crownBaseExpression);
+			}
+			if(crownBaseArray.length == 1){
+				for(i = 0; i< crownBaseArray.length; i++){
+					crownBaseExpression = "crown_base = "+crownBaseArray[i];
+				}
+				console.log("Where "+crownBaseExpression);
+				setFeatureLayerViewFilter(crownBaseExpression);
+			}
+			if(heightArray.length >= 1 && crownBaseArray.length >=1){
+				let combinedExpression = heightExpression + " and " + crownBaseExpression;
+				console.log("where " + combinedExpression );
+				setFeatureLayerViewFilter(combinedExpression);
+			}
+		}
+		
+		function setFeatureLayerViewFilter(expression) {
+			view.whenLayerView(flayer).then(function(featureLayerView) {
+			  featureLayerView.filter = {
+				where: expression
+			  };
+			  featureLayerView.queryFeatureCount().then(function(count){console.log("C: "+count);})
+			});
+		}
+
+	});
+	</script>
+
+</head>
+<body>
+	<div id="layer_list">
+		<span>Height Ft.: </span>
+		<input type='checkbox' class='height_item' id='layer1CheckBox' value=8 name="checkbox1" />8
+		<input type='checkbox' class='height_item' id='layer2CheckBox' value=14 name="checkbox2" />14
+		<input type='checkbox' class='height_item' id='layer3CheckBox' value=38 name="checkbox3" />38
+		</br>
+		</br>
+		<span>Crown Base: </span>
+		<input type='checkbox' class='crown_item' id='layer4CheckBox' value=1 name="checkbox4" />1
+		<input type='checkbox' class='crown_item' id='layer5CheckBox' value=8 name="checkbox5" />8
+	</div>
+  <div id="viewDiv"></div>
+</body>
+</html> 
+
+
+
