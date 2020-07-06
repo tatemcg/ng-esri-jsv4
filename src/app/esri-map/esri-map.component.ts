@@ -139,7 +139,7 @@ export class EsriMapComponent implements OnInit
                 return result.graphic.layer === layerFeature;
               })[0].graphic;
               this.selectedFIPS = graphic.attributes.STATE_NAME;
-              document.getElementById("TotalPopData").innerHTML = "Total Obligated For " + this.selectedFIPS + " is: ";
+              document.getElementById("TotalPopData").innerHTML = "Name For " + this.selectedFIPS + " is: ";
               this.consoleFIPS();
             };
           })
